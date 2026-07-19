@@ -107,3 +107,56 @@ form .btn-submit:hover::after {
 .message.error {
   color: #f44336;
 }
+
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  min-height: 100vh;
+  gap: 30px;
+}
+
+.admin-form {
+  flex-direction: column; 
+  align-items: center;
+  gap: 25px;
+  max-width: 400px;
+}
+
+.admin-form .input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.admin-form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #5a5a5a;
+  margin-bottom: 2px;
+}
+
+.admin-form hr {
+  width: 100%; 
+  background-color: #858585;
+  border: none;
+  height: 1px;
+}
+
+.admin-form input {
+  padding: 0;
+  height: 2rem;
+  width: 100%;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: #333333;
+}
+
+.admin-form .btn-submit {
+  margin-top: 10px;
+  font-size: 1.1rem;
+}

@@ -42,6 +42,35 @@ func enviarEmailConfirmacao(destinatario string) {
 	fmt.Println("E-mail enviado com sucesso para", destinatario)
 }
 
+func enviarEmailLancamento(destinatario, nomeMusica, link string) {
+	remetente := os.Getenv("REMETENTE")
+	senha := os.Getenv("SENHA")
+
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	mensagem := []byte(
+		"Subject: New Song is OUT!\r\n" +
+			"Content-Type: text/plain; charset=\"utf-8\"\r\n" +
+			"\r\n" +
+			"Sup!\n\n" +
+			"Just released a new music called \"" + nomeMusica + "\".\n\n" +
+			"Hurry to listen it: " + link + "\n\n" +
+			"Thanks for keep up with my work!",
+	)
+
+	auth := smtp.PlainAuth("", remetente, senha, smtpHost)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, remetente, []string{destinatario}, mensagem)
+
+	if err != nil {
+		fmt.Println("Erro ao enviar musica para", destinatario, ":", err)
+		return
+	}
+	fmt.Println("Novidade enviada com sucesso para", destinatario)
+
+}
+
 func main() {
 
 	err := godotenv.Load()
@@ -95,6 +124,53 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Inscrito com sucesso!"})
 
+	})
+
+	r.POST("/api/notify-release", func(c *gin.Context) {
+		var json struct {
+			NomeMusica string `json:"nome_musica" binding:"required"`
+			Link       string `json:"link" binding:"required"`
+			SenhaAdmin string `json:"senha_admin" binding:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&json); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"erro": "Preencha todos os dados"})
+			return
+		}
+
+		if json.SenhaAdmin != os.Getenv("SENHA_ADM") {
+			c.JSON(http.StatusUnauthorized, gin.H{"erro": "nao autorizado"})
+			return
+		}
+
+		url := os.Getenv("DB_CONN_ACS")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		conn, err := pgx.Connect(ctx, url)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha no banco"})
+			return
+		}
+		defer conn.Close(ctx)
+
+		rows, err := conn.Query(ctx, "SELECT email from subscribers")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"erro": "Erro ao buscar inscritos"})
+			return
+		}
+
+		defer rows.Close()
+
+		contador := 0
+		for rows.Next() {
+			var email string
+			if err := rows.Scan(&email); err == nil {
+				go enviarEmailLancamento(email, json.NomeMusica, json.Link)
+				contador++
+			}
+		}
+		c.JSON(http.StatusOK, gin.H{"mensagem": fmt.Sprintf("Iniciando envio para %d pessoas!", contador)})
 	})
 
 	r.Run("0.0.0.0:8081")
