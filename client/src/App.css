@@ -72,6 +72,11 @@ form .btn-submit{
   padding: 0;
   line-height: 1;
   font-weight: bold;
+  transition: 0.3s ease;
+}
+
+form .btn-submit:active{
+  color: #5a5a5a;
 }
 
 form .btn-submit::after{
