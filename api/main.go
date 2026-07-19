@@ -25,10 +25,10 @@ func enviarEmailConfirmacao(destinatario string) {
 	smtpPort := "587"
 
 	mensagem := []byte(
-		"Subject: Inscrição Confirmada!\r\n" +
+		"Subject: Subscription Confirmed!\r\n" +
 			"Content-Type: text/plain; charset=\"utf-8\"\r\n" +
 			"\r\n" +
-			"Olá!\n\nSua inscrição foi confirmada com sucesso. Fique ligado para receber novidades sobre os próximos lançamentos!",
+			"Hey!\n\nYour registration has been successfully confirmed. Stay tuned for updates on upcoming releases!",
 	)
 
 	auth := smtp.PlainAuth("", remetente, senha, smtpHost)
