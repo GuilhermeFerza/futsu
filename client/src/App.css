@@ -71,6 +71,7 @@ form .btn-submit{
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  font-weight: bold;
 }
 
 form .btn-submit::after{
