@@ -1,4 +1,5 @@
-module futsu
+module github.com/GuilhermeFerza/futsu
+
 
 go 1.25.2
 
